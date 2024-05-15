@@ -64,7 +64,7 @@ class Debouncer
      * @param \DateTimeInterface|\DateInterval|int|null $wait
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
-    public function __invoke($job, $wait)
+    public function __invoke($job, $wait, $queue = "default")
     {
         Cache::put(
             $key = $this->keyProvider->getKey($job),
@@ -73,7 +73,9 @@ class Debouncer
 
         return dispatch(
             $this->factory->makeDispatcher($job, $key, $identifier)
-        )->delay($wait);
+        )
+        ->onQueue($queue)
+        ->delay($wait);
     }
 
     /**
@@ -81,8 +83,8 @@ class Debouncer
      * @param \DateTimeInterface|\DateInterval|int|null $wait
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
-    public function debounce($job, $wait)
+    public function debounce($job, $wait, $queue = "default")
     {
-        return $this($job, $wait);
+        return $this($job, $wait, $queue);
     }
 }
